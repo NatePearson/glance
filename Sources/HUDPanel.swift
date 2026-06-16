@@ -2,11 +2,10 @@ import AppKit
 import QuartzCore
 
 // A borderless, translucent panel that floats near the cursor and streams the
-// answer in. Built for shoulder-surf resistance: in "private" mode the answer
-// is HIDDEN at rest — the panel shows nothing but a "hold ⌥ to reveal" hint —
-// and the text only appears while you hold ⌥ (Option). Release and it vanishes
-// again. Nothing readable is ever on screen unless you're actively holding the
-// key, so a bystander can't catch it.
+// answer in. Built for shoulder-surf resistance: in "private" mode the ENTIRE
+// panel is hidden at rest (window alpha 0) and only fades into view while you
+// hold ⌥ (Option) — release and the whole thing vanishes again. Nothing is on
+// screen unless you're actively holding the key, so a bystander can't catch it.
 //
 // It's a .nonactivatingPanel (no dock bounce) that takes key focus so Esc, ⌘C
 // (copy — works without revealing), the follow-up field, and the hold-to-reveal
@@ -42,6 +41,7 @@ final class GlanceHUD: NSObject, NSTextFieldDelegate, NSWindowDelegate {
     private let fieldH: CGFloat = 26
     private let gap: CGFloat = 7
     private let maxScroll: CGFloat = 240
+    private let shownAlpha: CGFloat = 0.97   // window opacity when visible
     private let revealKey = "hold ⌥ to reveal"
 
     private var answerAttrs: [NSAttributedString.Key: Any] {
@@ -67,9 +67,11 @@ final class GlanceHUD: NSObject, NSTextFieldDelegate, NSWindowDelegate {
 
         privateOn = Config.privateMode
         revealed = false
-        scrollView.alphaValue = privateOn ? 0 : 1   // hidden at rest in private mode
-        hintLabel.stringValue = revealKey
-        hintLabel.isHidden = !privateOn
+        scrollView.alphaValue = 1
+        hintLabel.isHidden = true
+        // In private mode the ENTIRE panel is hidden at rest and only appears
+        // while ⌥ is held; otherwise it's visible immediately.
+        panel?.alphaValue = privateOn ? 0 : shownAlpha
 
         position(near: point)
         NSApp.activate(ignoringOtherApps: true)   // needed for key focus (no dock icon)
@@ -131,9 +133,8 @@ final class GlanceHUD: NSObject, NSTextFieldDelegate, NSWindowDelegate {
         NSAnimationContext.runAnimationGroup { ctx in
             ctx.duration = 0.10
             ctx.timingFunction = CAMediaTimingFunction(name: .easeOut)
-            scrollView.animator().alphaValue = reveal ? 1 : 0   // show only while held
+            panel?.animator().alphaValue = reveal ? shownAlpha : 0   // show whole panel only while held
         }
-        hintLabel.isHidden = reveal
     }
 
     // MARK: - Build
@@ -149,7 +150,7 @@ final class GlanceHUD: NSObject, NSTextFieldDelegate, NSWindowDelegate {
         panel.isOpaque = false
         panel.backgroundColor = .clear
         panel.hasShadow = true
-        panel.alphaValue = 0.97
+        panel.alphaValue = shownAlpha
         panel.hidesOnDeactivate = false
         panel.isMovableByWindowBackground = true
         panel.collectionBehavior = [.canJoinAllSpaces, .fullScreenAuxiliary]
@@ -334,7 +335,7 @@ final class GlanceHUD: NSObject, NSTextFieldDelegate, NSWindowDelegate {
         DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) { [weak self] in
             guard let self = self, self.hintLabel.stringValue == text else { return }
             self.hintLabel.stringValue = self.revealKey
-            self.hintLabel.isHidden = self.revealed || !self.privateOn
+            self.hintLabel.isHidden = true
         }
     }
 

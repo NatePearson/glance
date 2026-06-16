@@ -54,7 +54,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
 
         menu.addItem(.separator())
 
-        let priv = NSMenuItem(title: "Private — hide answer, hold ⌥ to reveal",
+        let priv = NSMenuItem(title: "Private — hidden until you hold ⌥",
                               action: #selector(togglePrivate), keyEquivalent: "")
         priv.state = Config.privateMode ? .on : .off
         menu.addItem(priv)
@@ -257,7 +257,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         ⌥⌘S   Ask about a screen region
         Menu  Ask about the clipboard
 
-        Private mode hides the answer — hold ⌥ to reveal it.
+        Private mode keeps the whole panel hidden — hold ⌥ to show it.
         In the panel: type a follow-up and press ↵, ⌘C copies the answer, Esc closes.
 
         Model: \(Config.modelDisplayName(Config.model))  ·  Mode: \(Config.maxMode ? "Max" : "Normal")

@@ -20,7 +20,7 @@ Glance runs through your **local Claude Code CLI** (`claude`) in headless mode, 
 
 In the answer panel:
 
-- **Hold ⌥ (Option) to reveal.** In private mode the answer stays hidden at rest — the panel shows only a *hold ⌥ to reveal* hint. The text appears while you hold ⌥ and vanishes the instant you let go, so nothing readable sits on screen. (See *Private mode* below.)
+- **Hold ⌥ (Option) to reveal.** In private mode the **whole panel** is hidden at rest — nothing is on screen at all. The entire panel fades in while you hold ⌥ and vanishes the instant you let go. (See *Private mode* below.)
 - **Type a follow-up** and press **↵** — the conversation keeps context (it resumes the same `claude` session).
 - **⌘C** copies the answer (works without revealing it).
 - **Esc**, the ✕ button, or **clicking back into your work** dismisses it.
@@ -29,9 +29,9 @@ No dock icon, no app window — just the ✨ in your menu bar and the overlay wh
 
 ### Private mode (shoulder-surf resistance)
 
-On by default. The answer is kept **hidden** — the panel shows only a *hold ⌥ to reveal* hint until you press and hold **⌥ (Option)**. The text appears while you hold it and disappears the moment you let go, so a bystander never catches it. Copying (⌘C) still works while it's hidden.
+On by default. The **entire panel** is hidden — nothing appears on screen until you press and hold **⌥ (Option)**, and the whole thing vanishes the moment you let go, so a bystander never catches it. (⌘C still copies the answer even without revealing.)
 
-Toggle it off in the menu (✨ ▸ *Private — hide answer, hold ⌥ to reveal*) if you'd rather see the answer plainly.
+Toggle it off in the menu (✨ ▸ *Private — hidden until you hold ⌥*) if you'd rather the panel just stay visible.
 
 > This is **privacy from a casual bystander, not security.** It does not defend against screenshots, screen recording, or someone watching while you hold ⌥. Don't treat it as protection for genuinely sensitive data.
 
@@ -51,7 +51,7 @@ Once the answer panel is open:
 
 | Key | Action |
 | --- | --- |
-| **Hold ⌥ (Option)** | Reveal the answer (private mode keeps it hidden until you do). Let go to hide. |
+| **Hold ⌥ (Option)** | Reveal the whole panel (private mode keeps it hidden until you do). Let go to hide. |
 | **↵ Return** | Send a typed follow-up — the conversation keeps its context. |
 | **⌘C** | Copy the whole answer (works even while it's hidden). |
 | **Esc** | Close the panel. (Clicking back into your other window also closes it.) |
