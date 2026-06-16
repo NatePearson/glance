@@ -8,6 +8,19 @@ SDK="$(xcrun --sdk macosx --show-sdk-path)"
 DEPLOY="13.0"   # minimum macOS
 mkdir -p build
 
+# Generate the app icon (AppIcon.icns) from make-icon.swift if it's missing.
+if [ ! -f AppIcon.icns ]; then
+    echo "→ Generating app icon…"
+    swiftc -swift-version 5 -sdk "$SDK" -framework Cocoa make-icon.swift -o build/mkicon
+    build/mkicon build/icon_1024.png
+    SET=build/Glance.iconset; rm -rf "$SET"; mkdir -p "$SET"
+    for s in 16 32 128 256 512; do
+        sips -z "$s" "$s" build/icon_1024.png --out "$SET/icon_${s}x${s}.png" >/dev/null
+        sips -z "$((s*2))" "$((s*2))" build/icon_1024.png --out "$SET/icon_${s}x${s}@2x.png" >/dev/null
+    done
+    iconutil -c icns "$SET" -o AppIcon.icns
+fi
+
 echo "→ Compiling universal binary (arm64 + x86_64)…"
 swiftc -O -swift-version 5 -sdk "$SDK" -target "arm64-apple-macosx$DEPLOY" \
     -framework Cocoa -framework Carbon Sources/*.swift -o build/Glance-arm64

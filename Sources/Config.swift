@@ -6,8 +6,8 @@ import Foundation
 // auth Claude Code is logged in with — a Claude subscription needs no API key.
 // Make sure `claude` works in your terminal first (`claude /login` if needed).
 enum Config {
-    // Private mode (default ON): render the answer blurred at rest so a
-    // bystander can't read it; hold ⌥ to bring it into focus while you read.
+    // Private mode (default ON): keep the answer hidden at rest so a bystander
+    // can't read it; the text appears only while you hold ⌥, then vanishes again.
     static var privateMode: Bool {
         get { UserDefaults.standard.object(forKey: "privateMode") as? Bool ?? true }
         set { UserDefaults.standard.set(newValue, forKey: "privateMode") }

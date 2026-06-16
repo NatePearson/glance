@@ -2,11 +2,11 @@ import AppKit
 import QuartzCore
 
 // A borderless, translucent panel that floats near the cursor and streams the
-// answer in. Built for shoulder-surf resistance: in "private" mode a native
-// frosted-glass layer (NSVisualEffectView, within-window blend) sits over the
-// answer so a bystander sees only a soft frosted smudge — never the text. You
-// hold ⌥ (Option) to fade the frost away and read; release and it frosts back.
-// You always know it's there; someone glancing at the screen can't read it.
+// answer in. Built for shoulder-surf resistance: in "private" mode the answer
+// is HIDDEN at rest — the panel shows nothing but a "hold ⌥ to reveal" hint —
+// and the text only appears while you hold ⌥ (Option). Release and it vanishes
+// again. Nothing readable is ever on screen unless you're actively holding the
+// key, so a bystander can't catch it.
 //
 // It's a .nonactivatingPanel (no dock bounce) that takes key focus so Esc, ⌘C
 // (copy — works without revealing), the follow-up field, and the hold-to-reveal
@@ -14,12 +14,6 @@ import QuartzCore
 final class FloatingPanel: NSPanel {
     override var canBecomeKey: Bool { true }
     override var canBecomeMain: Bool { false }
-}
-
-// A frost layer that never intercepts the mouse, so the answer underneath stays
-// scrollable/selectable when revealed.
-final class PassthroughEffectView: NSVisualEffectView {
-    override func hitTest(_ point: NSPoint) -> NSView? { nil }
 }
 
 final class GlanceHUD: NSObject, NSTextFieldDelegate, NSWindowDelegate {
@@ -35,7 +29,6 @@ final class GlanceHUD: NSObject, NSTextFieldDelegate, NSWindowDelegate {
     private var closeButton: NSButton!
     private var scrollView: NSScrollView!
     private var textView: NSTextView!
-    private var privacyCover: PassthroughEffectView!
     private var followUp: NSTextField!
     private var keyMonitor: Any?
     private var flagsMonitor: Any?
@@ -49,7 +42,7 @@ final class GlanceHUD: NSObject, NSTextFieldDelegate, NSWindowDelegate {
     private let fieldH: CGFloat = 26
     private let gap: CGFloat = 7
     private let maxScroll: CGFloat = 240
-    private let revealKey = "hold ⌥ to read"
+    private let revealKey = "hold ⌥ to reveal"
 
     private var answerAttrs: [NSAttributedString.Key: Any] {
         [.font: NSFont.systemFont(ofSize: 12), .foregroundColor: NSColor.labelColor]
@@ -74,8 +67,7 @@ final class GlanceHUD: NSObject, NSTextFieldDelegate, NSWindowDelegate {
 
         privateOn = Config.privateMode
         revealed = false
-        privacyCover.isHidden = !privateOn
-        privacyCover.alphaValue = 1
+        scrollView.alphaValue = privateOn ? 0 : 1   // hidden at rest in private mode
         hintLabel.stringValue = revealKey
         hintLabel.isHidden = !privateOn
 
@@ -137,9 +129,9 @@ final class GlanceHUD: NSObject, NSTextFieldDelegate, NSWindowDelegate {
         guard privateActive, reveal != revealed else { return }
         revealed = reveal
         NSAnimationContext.runAnimationGroup { ctx in
-            ctx.duration = 0.11
+            ctx.duration = 0.10
             ctx.timingFunction = CAMediaTimingFunction(name: .easeOut)
-            privacyCover.animator().alphaValue = reveal ? 0 : 1
+            scrollView.animator().alphaValue = reveal ? 1 : 0   // show only while held
         }
         hintLabel.isHidden = reveal
     }
@@ -217,17 +209,6 @@ final class GlanceHUD: NSObject, NSTextFieldDelegate, NSWindowDelegate {
         self.scrollView = scroll
         self.textView = tv
 
-        // The frost layer that hides the answer at rest. within-window blend =
-        // it frosts the in-window content (the text) beneath it; passthrough so
-        // it never blocks scrolling/selection.
-        let cover = PassthroughEffectView()
-        cover.material = .hudWindow
-        cover.blendingMode = .withinWindow
-        cover.state = .active
-        cover.wantsLayer = true
-        effect.addSubview(cover)   // above the scroll view
-        self.privacyCover = cover
-
         followUp = NSTextField()
         followUp.placeholderString = "follow-up…  ↵"
         followUp.font = .systemFont(ofSize: 11.5)
@@ -274,7 +255,6 @@ final class GlanceHUD: NSObject, NSTextFieldDelegate, NSWindowDelegate {
                                  width: b.width - 2 * margin,
                                  height: max(20, scrollTop - scrollY))
         scrollView.frame = scrollFrame
-        privacyCover.frame = scrollFrame.insetBy(dx: -3, dy: -3)   // fully cover edges
 
         textView.minSize = NSSize(width: 0, height: 0)
         textView.maxSize = NSSize(width: scrollView.contentSize.width, height: .greatestFiniteMagnitude)

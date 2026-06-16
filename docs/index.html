@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Glance — a discreet Claude assistant for macOS</title>
+<meta name="description" content="Glance is a discreet, ambient Claude assistant for your Mac menu bar. Hit a hotkey from any app to ask about your selection or a screen grab — powered by your Claude Code login. No API key." />
+<meta property="og:title" content="Glance — a discreet Claude assistant for macOS" />
+<meta property="og:description" content="Hit a hotkey from any app to ask Claude about your selection or a screen grab. Answers float in near your cursor. No API key." />
+<meta property="og:image" content="icon.png" />
+<link rel="icon" href="icon.png" />
+<style>
+  :root{
+    --bg:#0e0b1a; --bg2:#161031; --card:#1b1536; --line:#2c2350;
+    --txt:#ece9f7; --dim:#a59fc4; --violet:#7c5cfc; --violet2:#9b7bff; --accent:#b9a6ff;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html{scroll-behavior:smooth}
+  body{
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Inter,Helvetica,Arial,sans-serif;
+    background:radial-gradient(1200px 700px at 50% -10%,#241a4d 0%,var(--bg) 55%);
+    color:var(--txt);line-height:1.6;-webkit-font-smoothing:antialiased;
+  }
+  a{color:var(--accent);text-decoration:none}
+  a:hover{text-decoration:underline}
+  .wrap{max-width:920px;margin:0 auto;padding:0 22px}
+  code{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;background:#0c0920;border:1px solid var(--line);
+       padding:.12em .45em;border-radius:6px;font-size:.92em;color:#d7ccff}
+  pre{background:#0c0920;border:1px solid var(--line);border-radius:12px;padding:14px 16px;overflow:auto;margin:10px 0}
+  pre code{background:none;border:none;padding:0;color:#cfc4ff}
+
+  /* hero */
+  header{text-align:center;padding:72px 0 28px}
+  .icon{width:128px;height:128px;border-radius:28px;box-shadow:0 18px 50px rgba(90,60,220,.45);}
+  h1{font-size:54px;letter-spacing:-1.5px;margin:18px 0 6px;font-weight:800}
+  .tag{font-size:20px;color:var(--dim);max-width:600px;margin:0 auto}
+  .btns{display:flex;gap:14px;justify-content:center;flex-wrap:wrap;margin:30px 0 8px}
+  .btn{display:inline-flex;align-items:center;gap:9px;padding:13px 24px;border-radius:12px;font-weight:650;font-size:16px;
+       transition:transform .08s ease, box-shadow .2s ease}
+  .btn:hover{text-decoration:none;transform:translateY(-1px)}
+  .btn-primary{background:linear-gradient(180deg,var(--violet2),var(--violet));color:#fff;
+               box-shadow:0 10px 28px rgba(124,92,252,.5)}
+  .btn-ghost{background:var(--card);color:var(--txt);border:1px solid var(--line)}
+  .sub{font-size:13.5px;color:var(--dim);margin-top:4px}
+
+  /* callout */
+  .callout{background:linear-gradient(180deg,#2a1f1a,#231a17);border:1px solid #5a3b22;
+           border-radius:14px;padding:16px 18px;margin:26px 0;color:#f4d9be}
+  .callout b{color:#ffcf9e}
+
+  section{padding:26px 0}
+  h2{font-size:26px;letter-spacing:-.5px;margin-bottom:14px}
+  .grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:16px}
+  .card{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:18px}
+  .card h3{font-size:16px;margin-bottom:6px}
+  .card p{font-size:14.5px;color:var(--dim)}
+  .kbd{display:inline-block;background:#0c0920;border:1px solid var(--line);border-bottom-width:2px;
+       border-radius:7px;padding:2px 8px;font-family:ui-monospace,Menlo,monospace;font-size:13px;color:#e3dcff}
+
+  table{width:100%;border-collapse:collapse;margin-top:8px;font-size:14.5px}
+  th,td{text-align:left;padding:11px 12px;border-bottom:1px solid var(--line);vertical-align:top}
+  th{color:var(--dim);font-weight:600;font-size:12.5px;text-transform:uppercase;letter-spacing:.5px}
+  td:first-child{white-space:nowrap}
+
+  ol{padding-left:20px} ol li{margin:8px 0;color:var(--txt)}
+  footer{text-align:center;color:var(--dim);font-size:13.5px;padding:40px 0 60px;border-top:1px solid var(--line);margin-top:30px}
+  .muted{color:var(--dim)}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header>
+    <img class="icon" src="icon.png" alt="Glance icon" />
+    <h1>Glance</h1>
+    <p class="tag">A discreet, ambient <b>Claude assistant</b> for your Mac menu bar. Hit a hotkey from any app and the answer floats in near your cursor.</p>
+    <div class="btns">
+      <a class="btn btn-primary" href="https://github.com/NatePearson/glance/releases/latest/download/Glance.dmg">⬇︎&nbsp; Download for macOS</a>
+      <a class="btn btn-ghost" href="https://github.com/NatePearson/glance">View on GitHub</a>
+    </div>
+    <div class="sub">Free &amp; open source · macOS 13+ · Apple Silicon &amp; Intel · <a href="https://github.com/NatePearson/glance/releases/latest">all downloads &amp; .zip</a></div>
+  </header>
+
+  <div class="callout">
+    ⚠️ <b>You need Claude Code.</b> Glance has no API of its own — it drives your local <code>claude</code> command, signed in with your own Claude plan. If you don't have <a href="https://www.claude.com/product/claude-code">Claude Code</a> installed and logged in (<code>claude /login</code>), Glance can't answer.
+  </div>
+
+  <section>
+    <h2>What it does</h2>
+    <div class="grid">
+      <div class="card"><h3>✶ Ask about a selection</h3><p>Highlight text in any app and press <span class="kbd">⌥⌘A</span>. Glance reads it and answers, explains, translates, or rewrites it.</p></div>
+      <div class="card"><h3>✶ Screenshot a question</h3><p>Press <span class="kbd">⌥⌘S</span>, drag a box over anything — an error, a chart, text in an image — and ask about what's on screen.</p></div>
+      <div class="card"><h3>✶ Private by default</h3><p>The answer stays <b>hidden</b> until you hold <span class="kbd">⌥</span>. Nobody glancing at your screen can read it; let go and it vanishes.</p></div>
+      <div class="card"><h3>✶ Your model, your plan</h3><p>Choose <b>Opus 4.8</b> or <b>Sonnet 4.6</b>, and <b>Normal</b> or <b>Max</b> effort — right from the menu bar. No API key, runs on your Claude subscription.</p></div>
+    </div>
+  </section>
+
+  <section>
+    <h2>⌨️ Keyboard shortcuts</h2>
+    <p class="muted">Two global hotkeys — they work in <b>any</b> app, no need to switch to Glance first.</p>
+    <table>
+      <tr><th>Shortcut</th><th>What happens</th></tr>
+      <tr><td><span class="kbd">⌥⌘A</span></td><td>Grab the <b>selected text</b> and answer about it.</td></tr>
+      <tr><td><span class="kbd">⌥⌘S</span></td><td>Drag a <b>screen region</b> (crosshair) and ask about it.</td></tr>
+      <tr><td>✨ menu</td><td><b>Ask about Clipboard</b> — answer about whatever you've copied.</td></tr>
+    </table>
+    <p class="muted" style="margin-top:18px">In the answer panel:</p>
+    <table>
+      <tr><th>Key</th><th>Action</th></tr>
+      <tr><td>Hold <span class="kbd">⌥</span></td><td>Reveal the answer (it's hidden until you do). Let go to hide.</td></tr>
+      <tr><td><span class="kbd">↵</span></td><td>Send a follow-up — keeps the conversation context.</td></tr>
+      <tr><td><span class="kbd">⌘C</span></td><td>Copy the whole answer (works even while hidden).</td></tr>
+      <tr><td><span class="kbd">esc</span></td><td>Close. (Clicking back into your work also closes it.)</td></tr>
+    </table>
+  </section>
+
+  <section>
+    <h2>Install</h2>
+    <p><b>Option A — download the app</b></p>
+    <ol>
+      <li><a href="https://github.com/NatePearson/glance/releases/latest/download/Glance.dmg">Download <b>Glance.dmg</b></a>, open it, and drag <b>Glance</b> into Applications.</li>
+      <li>It's free and unsigned, so macOS Gatekeeper blocks it on first launch. Clear the quarantine flag once in Terminal:
+        <pre><code>xattr -dr com.apple.quarantine /Applications/Glance.app</code></pre>
+        Then open it. Look for the <b>✨</b> in your menu bar.</li>
+    </ol>
+    <p style="margin-top:18px"><b>Option B — build from source</b> (no Gatekeeper step; read every line first):</p>
+    <pre><code>git clone https://github.com/NatePearson/glance.git
+cd glance
+./build.sh
+open Glance.app</code></pre>
+    <p class="muted">First time you use <span class="kbd">⌥⌘A</span>, macOS asks for Accessibility permission (Glance sends a copy command to grab your selection). Screenshot mode needs no permission.</p>
+  </section>
+
+  <footer>
+    Glance is open source under the MIT license · <a href="https://github.com/NatePearson/glance">github.com/NatePearson/glance</a><br/>
+    Not affiliated with Anthropic. "Claude" and "Claude Code" are products of Anthropic.
+  </footer>
+
+</div>
+</body>
+</html>

@@ -4,6 +4,10 @@ A discreet, ambient **Claude assistant** for macOS that lives in your menu bar �
 
 Glance runs through your **local Claude Code CLI** (`claude`) in headless mode, so it uses whatever Claude Code is signed in with — a **Claude subscription needs no API key**. AppKit/Swift, no runtime dependencies. Sibling project to DripWriter — same `build.sh` workflow.
 
+### 🌐 [**Website & download → natepearson.github.io/glance**](https://natepearson.github.io/glance/)  ·  [⬇︎ Download the app](https://github.com/NatePearson/glance/releases/latest)
+
+> Heads-up: Glance needs **Claude Code installed and signed in** to work — it has no API of its own. See [Requirements](#requirements-read-this-first).
+
 ---
 
 ## What it does
@@ -16,7 +20,7 @@ Glance runs through your **local Claude Code CLI** (`claude`) in headless mode, 
 
 In the answer panel:
 
-- **Hold ⌥ (Option) to read.** In private mode the answer is frosted at rest — a soft, unreadable smudge to anyone glancing at your screen. Hold ⌥ to bring it into focus; release and it re-frosts. (See *Private mode* below.)
+- **Hold ⌥ (Option) to reveal.** In private mode the answer stays hidden at rest — the panel shows only a *hold ⌥ to reveal* hint. The text appears while you hold ⌥ and vanishes the instant you let go, so nothing readable sits on screen. (See *Private mode* below.)
 - **Type a follow-up** and press **↵** — the conversation keeps context (it resumes the same `claude` session).
 - **⌘C** copies the answer (works without revealing it).
 - **Esc**, the ✕ button, or **clicking back into your work** dismisses it.
@@ -25,11 +29,34 @@ No dock icon, no app window — just the ✨ in your menu bar and the overlay wh
 
 ### Private mode (shoulder-surf resistance)
 
-On by default. The answer renders behind a native frosted-glass layer, so someone looking over your shoulder sees only a blurred patch — never the text. You hold **⌥** to read it, release to hide it again. Copying (⌘C) still works while it's frosted.
+On by default. The answer is kept **hidden** — the panel shows only a *hold ⌥ to reveal* hint until you press and hold **⌥ (Option)**. The text appears while you hold it and disappears the moment you let go, so a bystander never catches it. Copying (⌘C) still works while it's hidden.
 
-Toggle it off in the menu (✨ ▸ *Private — blur answer, hold ⌥ to read*) if you'd rather see the answer plainly.
+Toggle it off in the menu (✨ ▸ *Private — hide answer, hold ⌥ to reveal*) if you'd rather see the answer plainly.
 
-> This is **privacy from a casual bystander, not security.** It does not defend against screenshots, screen recording, or someone who can see your screen clearly while you're holding ⌥. Don't treat it as protection for genuinely sensitive data.
+> This is **privacy from a casual bystander, not security.** It does not defend against screenshots, screen recording, or someone watching while you hold ⌥. Don't treat it as protection for genuinely sensitive data.
+
+---
+
+## ⌨️ Keyboard shortcuts
+
+Glance is driven by two global hotkeys — they work in **any** app, with no need to switch to Glance first.
+
+| Shortcut | What happens |
+| --- | --- |
+| **⌥⌘A** (Option-Command-A) | Grabs the **text you've selected** and answers about it. *Try it:* select a sentence anywhere, press ⌥⌘A. |
+| **⌥⌘S** (Option-Command-S) | Turns the cursor into a **crosshair** — drag a box over anything on screen (an error, a chart, text in an image) and Glance answers about it. |
+| ✨ menu ▸ *Ask about Clipboard* | Answers about whatever you've already copied. (No global key — ⌥⌘C is taken by Finder.) |
+
+Once the answer panel is open:
+
+| Key | Action |
+| --- | --- |
+| **Hold ⌥ (Option)** | Reveal the answer (private mode keeps it hidden until you do). Let go to hide. |
+| **↵ Return** | Send a typed follow-up — the conversation keeps its context. |
+| **⌘C** | Copy the whole answer (works even while it's hidden). |
+| **Esc** | Close the panel. (Clicking back into your other window also closes it.) |
+
+> ⌥ = Option, ⌘ = Command. Prefer different keys? Edit `registerHotKeys()` in `Sources/main.swift` and re-run `./build.sh`.
 
 ---
 
