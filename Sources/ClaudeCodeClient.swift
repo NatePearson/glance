@@ -90,6 +90,7 @@ final class ClaudeCodeClient {
         self.process = proc
 
         var buffer = Data()
+        var errData = Data()
         var streamedAny = false
         var started = false
         var resultText: String?
@@ -147,12 +148,23 @@ final class ClaudeCodeClient {
                 }
             }
         }
+        // Drain stderr continuously too, so a large error burst can't fill the
+        // pipe buffer and wedge the claude process mid-run.
+        errPipe.fileHandleForReading.readabilityHandler = { handle in
+            let chunk = handle.availableData
+            if chunk.isEmpty { return }
+            self.parseQueue.async { errData.append(chunk) }
+        }
 
         proc.terminationHandler = { _ in
             outPipe.fileHandleForReading.readabilityHandler = nil
-            let errData = (try? errPipe.fileHandleForReading.readToEnd()) ?? Data()
+            errPipe.fileHandleForReading.readabilityHandler = nil
+            let tail = (try? errPipe.fileHandleForReading.readToEnd()) ?? Data()
             self.parseQueue.async {
                 if !buffer.isEmpty { handleLine(buffer); buffer.removeAll() }
+                errData.append(tail)
+                let stderr = String(data: errData, encoding: .utf8)?
+                    .trimmingCharacters(in: .whitespacesAndNewlines) ?? ""
                 main.async {
                     self.process = nil
                     if self.cancelled { return }
@@ -170,8 +182,6 @@ final class ClaudeCodeClient {
                     if streamedAny { onDone(); return }
 
                     // Nothing at all — surface stderr if we have it.
-                    let stderr = String(data: errData, encoding: .utf8)?
-                        .trimmingCharacters(in: .whitespacesAndNewlines) ?? ""
                     if !started { onStart() }
                     onError(stderr.isEmpty ? "Claude Code returned no answer." : stderr)
                 }

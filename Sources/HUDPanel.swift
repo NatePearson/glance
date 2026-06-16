@@ -229,7 +229,7 @@ final class GlanceHUD: NSObject, NSTextFieldDelegate, NSWindowDelegate {
             }
             return event
         }
-        // Hold ⌥ to reveal; release to re-frost.
+        // Hold ⌥ to reveal the whole panel; release to hide it again.
         flagsMonitor = NSEvent.addLocalMonitorForEvents(matching: .flagsChanged) { [weak self] event in
             guard let self = self, self.panel?.isVisible == true, self.privateOn else { return event }
             self.setRevealed(event.modifierFlags.contains(.option))

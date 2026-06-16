@@ -90,11 +90,14 @@ No Gatekeeper hassle, and you can read every line first. Needs Xcode command-lin
 ```bash
 git clone https://github.com/NatePearson/glance.git
 cd glance
+./setup-signing.sh   # once — stable signature so Accessibility sticks across rebuilds
 ./build.sh
 open Glance.app
 ```
 
-`build.sh` compiles a universal (arm64 + x86_64) binary, assembles `Glance.app`, and ad-hoc signs it locally. Re-run after any change to `Sources/*.swift`.
+`build.sh` compiles a universal (arm64 + x86_64) binary, assembles `Glance.app`, and signs it. Re-run after any change to `Sources/*.swift`.
+
+**About `setup-signing.sh`:** by default the app is ad-hoc signed, which gives it a *new* code signature on every build — macOS then treats each rebuild as a new app and re-asks for Accessibility. `setup-signing.sh` creates one fixed self-signed certificate (in a dedicated keychain; your login keychain is untouched) so the signature stays constant and the permission sticks. Run it once before your first build. To undo: `security delete-keychain glance-signing.keychain`.
 
 ---
 
@@ -161,6 +164,7 @@ hotkey (Carbon)  ─▶  Capture            ─▶  ClaudeCodeClient            
 - **"Claude Code not found"** — install Claude Code / sign in, or set the path via ✨ ▸ Set Claude Path… (`which claude`).
 - **Slow first answer** — expected; see the trade-off above. Use Normal mode (not Max), or pick Sonnet 4.6 in the Model menu.
 - **⌥⌘A says it can't read a selection** — grant Accessibility, and make sure text is actually selected in the front app.
+- **It re-asks for Accessibility every time I rebuild/restart** — that's ad-hoc signing. Run `./setup-signing.sh` once, rebuild, grant Accessibility one more time (remove any stale "Glance" entry in *Privacy & Security ▸ Accessibility* first), and it'll stick from then on.
 - **Auth errors / "Invalid API key"** — your Claude Code login may have expired. Run `claude` in Terminal and re-login (`claude /login`); Glance uses the same credentials.
 - **Nothing happens on a hotkey** — another app may have grabbed the same global shortcut. Change the binding in `registerHotKeys()` and rebuild.
 - **Screenshot capture does nothing** — pressing Esc during the crosshair cancels (expected). If the crosshair never appears, grant Screen Recording when macOS prompts.

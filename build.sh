@@ -36,8 +36,18 @@ cp build/Glance "$APP/Contents/MacOS/Glance"
 cp Info.plist "$APP/Contents/Info.plist"
 [ -f AppIcon.icns ] && cp AppIcon.icns "$APP/Contents/Resources/AppIcon.icns" || true
 
-echo "→ Signing (ad-hoc)…"
-codesign --force --deep --sign - "$APP"
+# Sign with the stable self-signed identity if it exists (so macOS remembers
+# Accessibility across rebuilds — see setup-signing.sh); otherwise ad-hoc.
+SIGN_ID="Glance Self-Signed"
+SIGN_KC="glance-signing.keychain"
+if security find-certificate -c "$SIGN_ID" "$SIGN_KC" >/dev/null 2>&1; then
+    echo "→ Signing with stable identity '$SIGN_ID'…"
+    security unlock-keychain -p glance-build "$SIGN_KC" >/dev/null 2>&1 || true
+    codesign --force --deep -s "$SIGN_ID" --keychain "$SIGN_KC" "$APP"
+else
+    echo "→ Signing (ad-hoc — run ./setup-signing.sh once so Accessibility sticks across rebuilds)…"
+    codesign --force --deep --sign - "$APP"
+fi
 
 echo "✓ Built $(pwd)/$APP"
 echo "  Launch with:  open $APP        (or double-click it in Finder)"
