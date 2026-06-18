@@ -13,6 +13,7 @@
 // Screenshot capture uses Apple's `screencapture` (handles Screen Recording on
 // its own). Rebuild with ./build.sh.
 import AppKit
+import ServiceManagement
 
 final class AppDelegate: NSObject, NSApplicationDelegate {
     private var statusItem: NSStatusItem!
@@ -84,6 +85,10 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         let modeItem = NSMenuItem(title: "Mode", action: nil, keyEquivalent: "")
         modeItem.submenu = modeMenu
         menu.addItem(modeItem)
+
+        let login = NSMenuItem(title: "Launch at Login", action: #selector(toggleLaunchAtLogin), keyEquivalent: "")
+        login.state = (SMAppService.mainApp.status == .enabled) ? .on : .off
+        menu.addItem(login)
 
         menu.addItem(withTitle: "Set Claude Path…", action: #selector(setClaudePath), keyEquivalent: "")
 
@@ -214,6 +219,35 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
 
     @objc private func pickMode(_ sender: NSMenuItem) {
         Config.maxMode = (sender.representedObject as? Bool) ?? false
+        rebuildMenu()
+    }
+
+    // Launch Glance when you log in. Uses the modern, sanctioned login-item API
+    // (SMAppService) — it's a normal Login Item you fully control: toggle it off
+    // here, quit from the menu anytime. It does NOT respawn after you quit or
+    // resist being closed; that's deliberate.
+    @objc private func toggleLaunchAtLogin() {
+        let svc = SMAppService.mainApp
+        do {
+            if svc.status == .enabled {
+                try svc.unregister()
+            } else {
+                try svc.register()
+            }
+        } catch {
+            NSApp.activate(ignoringOtherApps: true)
+            let a = NSAlert()
+            a.messageText = "Couldn't change Launch at Login"
+            a.informativeText = error.localizedDescription
+            a.runModal()
+        }
+        if svc.status == .requiresApproval {
+            NSApp.activate(ignoringOtherApps: true)
+            let a = NSAlert()
+            a.messageText = "Approve Glance in Login Items"
+            a.informativeText = "Open System Settings ▸ General ▸ Login Items & Extensions and enable Glance under “Open at Login”."
+            a.runModal()
+        }
         rebuildMenu()
     }
 

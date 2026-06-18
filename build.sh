@@ -23,9 +23,9 @@ fi
 
 echo "→ Compiling universal binary (arm64 + x86_64)…"
 swiftc -O -swift-version 5 -sdk "$SDK" -target "arm64-apple-macosx$DEPLOY" \
-    -framework Cocoa -framework Carbon Sources/*.swift -o build/Glance-arm64
+    -framework Cocoa -framework Carbon -framework ServiceManagement Sources/*.swift -o build/Glance-arm64
 swiftc -O -swift-version 5 -sdk "$SDK" -target "x86_64-apple-macosx$DEPLOY" \
-    -framework Cocoa -framework Carbon Sources/*.swift -o build/Glance-x86_64
+    -framework Cocoa -framework Carbon -framework ServiceManagement Sources/*.swift -o build/Glance-x86_64
 lipo -create build/Glance-arm64 build/Glance-x86_64 -output build/Glance
 echo "  $(lipo -archs build/Glance)"
 

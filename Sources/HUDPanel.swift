@@ -147,6 +147,11 @@ final class GlanceHUD: NSObject, NSTextFieldDelegate, NSWindowDelegate {
             styleMask: [.borderless, .nonactivatingPanel],
             backing: .buffered, defer: false)
         panel.level = .floating
+        // Exclude the panel from screen capture: screen recorders, screenshot
+        // tools, and screen-sharing (Zoom/Meet/Teams) cannot capture its
+        // contents — it reads as empty/black to them. Apple-sanctioned privacy
+        // API (the same one password managers use); does NOT hide the process.
+        panel.sharingType = .none
         panel.isOpaque = false
         panel.backgroundColor = .clear
         panel.hasShadow = true

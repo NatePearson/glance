@@ -31,9 +31,11 @@ No dock icon, no app window — just the ✨ in your menu bar and the overlay wh
 
 On by default. The **entire panel** is hidden — nothing appears on screen until you press and hold **⌥ (Option)**, and the whole thing vanishes the moment you let go, so a bystander never catches it. (⌘C still copies the answer even without revealing.)
 
-Toggle it off in the menu (✨ ▸ *Private — hidden until you hold ⌥*) if you'd rather the panel just stay visible.
+**It's also excluded from screen capture.** The panel is marked `NSWindow.sharingType = .none` (the same API password managers use), so screen recorders, screenshot tools, and screen-sharing (Zoom / Meet / Teams) capture it as blank — even while you hold ⌥ to read it.
 
-> This is **privacy from a casual bystander, not security.** It does not defend against screenshots, screen recording, or someone watching while you hold ⌥. Don't treat it as protection for genuinely sensitive data.
+Toggle private mode off in the menu (✨ ▸ *Private — hidden until you hold ⌥*) if you'd rather the panel just stay visible.
+
+> This is **privacy from a person looking at your screen (in person or over a share/recording), not security.** It does not hide that Glance is running, and it's not protection for genuinely sensitive data against someone with control of your machine.
 
 ---
 
@@ -127,7 +129,8 @@ Glance trims what it can — it overrides the system prompt, disables skills + M
 
 Menu bar ✨:
 
-- **Private** — on by default. Frost the answer; hold ⌥ to read. See *Private mode* above.
+- **Private** — on by default. Hides the whole panel until you hold ⌥, and excludes it from screen capture. See *Private mode* above.
+- **Launch at Login** — start Glance when you log in (a normal, fully-controllable Login Item via `SMAppService`). Toggle off here anytime; it does not respawn after you quit.
 - **Model ▸** — **Opus 4.8** (default, most capable) or **Sonnet 4.6** (faster, lighter).
 - **Mode ▸** — **Normal** (default, `--effort low`: snappy, terse) or **Max** (`--effort max`: deepest, slowest).
 - **Set Claude Path…** — override auto-detection.
